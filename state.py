@@ -7,6 +7,7 @@ user_category = {}
 user_state = {}
 temp_data = {}
 
+
 def load_data():
     if not os.path.exists(DATA_FILE):
         data = {"categories": {}}
@@ -16,9 +17,11 @@ def load_data():
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
 
 def load_stats():
     if not os.path.exists(STATS_FILE):
@@ -33,9 +36,11 @@ def load_stats():
     with open(STATS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def save_stats(data):
     with open(STATS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
 
 data_store = load_data()
 stats_store = load_stats()
