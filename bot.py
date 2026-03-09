@@ -85,13 +85,31 @@ def build_category_menu(category_name: str):
 
 @dp.message(F.text == "/start")
 async def start_handler(message: Message):
-    user_category.pop(message.from_user.id, None)
-    user_state.pop(message.from_user.id, None)
-    temp_data.pop(message.from_user.id, None)
+
+    user = message.from_user
+
+    user_id = user.id
+    username = user.username
+    first_name = user.first_name
+    last_name = user.last_name
+
+    # уведомление админу
+    await bot.send_message(
+        ADMIN_ID,
+        f"👤 Новый пользователь\n\n"
+        f"ID: {user_id}\n"
+        f"Username: @{username}\n"
+        f"Имя: {first_name}\n"
+        f"Фамилия: {last_name}"
+    )
+
+    user_category.pop(user_id, None)
+    user_state.pop(user_id, None)
+    temp_data.pop(user_id, None)
 
     await message.answer(
         "Выбери категорию 👇",
-        reply_markup=build_main_menu(message.from_user.id)
+        reply_markup=build_main_menu(user_id)
     )
 
 
