@@ -10,29 +10,24 @@ router = Router()
 
 @router.message(F.text == "➕ Категория")
 async def add_category_start(message: Message):
-
     if message.from_user.id != ADMIN_ID:
         return
 
     user_state[message.from_user.id] = "new_category"
-
     await message.answer("Отправь название новой категории")
 
 
 @router.message(F.text == "➕ Текст")
 async def add_text_start(message: Message):
-
     if message.from_user.id != ADMIN_ID:
         return
 
     user_state[message.from_user.id] = "choose_category"
-
     await message.answer("В какую категорию добавить текст?")
 
 
 @router.message()
 async def admin_handler(message: Message):
-
     user_id = message.from_user.id
     text = message.text
 
@@ -45,9 +40,7 @@ async def admin_handler(message: Message):
         raise SkipHandler()
 
     if state == "new_category":
-
         data_store["categories"][text] = {}
-
         save_data(data_store)
 
         user_state.pop(user_id, None)
@@ -56,7 +49,6 @@ async def admin_handler(message: Message):
         return
 
     elif state == "choose_category":
-
         if text not in data_store["categories"]:
             await message.answer("Категория не найдена")
             return
@@ -68,7 +60,6 @@ async def admin_handler(message: Message):
         return
 
     elif state == "text_name":
-
         temp_data[user_id]["button"] = text
         user_state[user_id] = "text_value"
 
@@ -76,12 +67,10 @@ async def admin_handler(message: Message):
         return
 
     elif state == "text_value":
-
         category = temp_data[user_id]["category"]
         button = temp_data[user_id]["button"]
 
         data_store["categories"][category][button] = text
-
         save_data(data_store)
 
         user_state.pop(user_id, None)
