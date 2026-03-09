@@ -1,10 +1,11 @@
 {
-  "buttons": {
-    "🍑 ANAL": "Текст для ANAL",
-    "🍆 DILDO": "Текст для DILDO",
-    "💬 SEXTING": "Текст для SEXTING",
-    "📹 VIDEOCALL": "Текст для VIDEOCALL",
-    "⭐ DICK RATE": "Текст для DICK RATE",
-    "✋ FINGERS": "Текст для FINGERS"
+  "categories": {
+    "🍆 DILDO": {
+      "Рассылка 1": "Текст для DILDO 1",
+      "Рассылка 2": "Текст для DILDO 2"
+    },
+    "🍑 ANAL": {
+      "Рассылка 1": "Текст для ANAL 1"
+    }
   }
 }
