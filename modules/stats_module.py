@@ -9,7 +9,6 @@ router = Router()
 
 @router.message(F.text == " Статистика")
 async def stats_handler(message: Message):
-
     if message.from_user.id != ADMIN_ID:
         return
 
@@ -33,7 +32,6 @@ async def stats_handler(message: Message):
 
 @router.message(F.text == " Пользователи")
 async def users_handler(message: Message):
-
     if message.from_user.id != ADMIN_ID:
         return
 
@@ -46,13 +44,8 @@ async def users_handler(message: Message):
     lines = []
 
     for uid, info in list(users.items())[:30]:
-
         starts = info.get("starts", 0)
-
-        lines.append(
-            f"ID: {uid} | Starts: {starts}"
-        )
+        lines.append(f"ID: {uid} | Starts: {starts}")
 
     text = "👥 Пользователи:\n\n" + "\n".join(lines)
-
     await message.answer(text)
