@@ -2,8 +2,16 @@ from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.dispatcher.event.bases import SkipHandler
 
-from database import add_fan_db, add_purchase_db, fan_exists, get_fan_by_id, get_crm_stats, search_fans
-from state import user_state, temp_data
+from database import (
+    add_fan_db,
+    add_purchase_db,
+    get_fan_by_id,
+    get_crm_stats,
+    search_fans,
+    resolve_fan_id,
+)
+from state import user_state, temp_data, user_category
+from modules.categories import build_main_menu
 
 router = Router()
 
@@ -34,9 +42,23 @@ def format_fan_card(fan):
 
 @router.message(F.text == "👤 Фанаты")
 async def fans_menu_handler(message: Message):
+    user_category.pop(message.from_user.id, None)
     user_state.pop(message.from_user.id, None)
     temp_data.pop(message.from_user.id, None)
+
     await message.answer("CRM фанатов", reply_markup=build_fans_menu())
+
+
+@router.message(F.text == "⬅ Назад")
+async def back_from_crm(message: Message):
+    user_category.pop(message.from_user.id, None)
+    user_state.pop(message.from_user.id, None)
+    temp_data.pop(message.from_user.id, None)
+
+    await message.answer(
+        "Главное меню",
+        reply_markup=build_main_menu(message.from_user.id)
+    )
 
 
 @router.message(F.text == "📊 Статистика CRM")
@@ -62,7 +84,7 @@ async def add_fan_start(message: Message):
 async def add_purchase_start(message: Message):
     user_state[message.from_user.id] = "crm_purchase_fan_id"
     temp_data[message.from_user.id] = {}
-    await message.answer("Введи ID фаната")
+    await message.answer("Введи ID, username или @username фаната")
 
 
 @router.message(F.text == "🔎 Найти фаната")
@@ -143,17 +165,17 @@ async def crm_flow_handler(message: Message):
         )
         user_state.pop(user_id, None)
         temp_data.pop(user_id, None)
-        await message.answer(f"Фанат добавлен ID {fan_id}", reply_markup=build_fans_menu())
+        await message.answer(
+            f"Фанат добавлен ID {fan_id}",
+            reply_markup=build_fans_menu()
+        )
         return
 
     if state == "crm_purchase_fan_id":
-        if not text.isdigit():
-            await message.answer("ID должен быть числом")
-            return
+        fan_id = resolve_fan_id(text)
 
-        fan_id = int(text)
-        if not fan_exists(fan_id):
-            await message.answer("Фанат с таким ID не найден")
+        if not fan_id:
+            await message.answer("Фанат не найден. Введи ID, username или @username")
             return
 
         temp_data[user_id]["fan_id"] = fan_id
@@ -174,7 +196,11 @@ async def crm_flow_handler(message: Message):
             await message.answer("Введи сумму числом")
             return
 
-        add_purchase_db(temp_data[user_id]["fan_id"], temp_data[user_id]["item_name"], amount)
+        add_purchase_db(
+            temp_data[user_id]["fan_id"],
+            temp_data[user_id]["item_name"],
+            amount
+        )
 
         fan_id = temp_data[user_id]["fan_id"]
         item_name = temp_data[user_id]["item_name"]
