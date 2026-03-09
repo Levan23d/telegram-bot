@@ -2,6 +2,7 @@ import sqlite3
 
 from config import CRM_DB
 
+
 def init_crm_db():
     conn = sqlite3.connect(CRM_DB)
     cur = conn.cursor()
@@ -140,6 +141,22 @@ def search_fans(query):
 
     conn.close()
     return results
+
+
+def resolve_fan_id(query):
+    q = query.strip()
+
+    if q.isdigit():
+        fan = get_fan_by_id(int(q))
+        if fan:
+            return fan[0]
+        return None
+
+    results = search_fans(q)
+    if not results:
+        return None
+
+    return results[0][0]
 
 
 def get_crm_stats():
