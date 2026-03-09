@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.dispatcher.event.bases import SkipHandler
 
 from database import add_fan_db, add_purchase_db, fan_exists, get_fan_by_id, get_crm_stats, search_fans
 from state import user_state, temp_data
@@ -77,7 +78,7 @@ async def crm_flow_handler(message: Message):
     state = user_state.get(user_id)
 
     if not state or not str(state).startswith("crm_"):
-        return
+        raise SkipHandler()
 
     if state == "crm_find_fan":
         results = search_fans(text)
@@ -186,3 +187,5 @@ async def crm_flow_handler(message: Message):
             reply_markup=build_fans_menu()
         )
         return
+
+    raise SkipHandler()
