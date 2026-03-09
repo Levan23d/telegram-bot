@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message
+from aiogram.dispatcher.event.bases import SkipHandler
 
 from config import ADMIN_ID
 from state import data_store, save_data, user_state, temp_data
@@ -36,9 +37,12 @@ async def admin_handler(message: Message):
     text = message.text
 
     if user_id != ADMIN_ID:
-        return
+        raise SkipHandler()
 
     state = user_state.get(user_id)
+
+    if not state:
+        raise SkipHandler()
 
     if state == "new_category":
 
@@ -46,30 +50,30 @@ async def admin_handler(message: Message):
 
         save_data(data_store)
 
-        user_state.pop(user_id)
+        user_state.pop(user_id, None)
 
         await message.answer(f"Категория {text} добавлена")
+        return
 
     elif state == "choose_category":
 
         if text not in data_store["categories"]:
-
             await message.answer("Категория не найдена")
             return
 
         temp_data[user_id] = {"category": text}
-
         user_state[user_id] = "text_name"
 
         await message.answer("Название кнопки")
+        return
 
     elif state == "text_name":
 
         temp_data[user_id]["button"] = text
-
         user_state[user_id] = "text_value"
 
         await message.answer("Теперь отправь сам текст")
+        return
 
     elif state == "text_value":
 
@@ -80,7 +84,10 @@ async def admin_handler(message: Message):
 
         save_data(data_store)
 
-        user_state.pop(user_id)
-        temp_data.pop(user_id)
+        user_state.pop(user_id, None)
+        temp_data.pop(user_id, None)
 
         await message.answer("Текст добавлен")
+        return
+
+    raise SkipHandler()
