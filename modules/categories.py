@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.dispatcher.event.bases import SkipHandler
 
 from config import ADMIN_ID
 from state import data_store, stats_store, save_stats, user_category, user_state, temp_data
@@ -36,7 +37,6 @@ async def start_handler(message: Message):
         stats_store["users"][user_id]["starts"] += 1
 
     stats_store["total_starts"] += 1
-
     save_stats(stats_store)
 
     await message.answer(
@@ -69,13 +69,19 @@ async def category_handler(message: Message):
             f"Категория: {text}",
             reply_markup=ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
         )
+        return
 
     elif text == "⬅ Назад":
+
+        user_state.pop(user_id, None)
+        temp_data.pop(user_id, None)
+        user_category.pop(user_id, None)
 
         await message.answer(
             "Главное меню",
             reply_markup=build_main_menu(user_id)
         )
+        return
 
     elif user_id in user_category:
 
@@ -86,3 +92,6 @@ async def category_handler(message: Message):
             await message.answer(
                 data_store["categories"][category][text]
             )
+            return
+
+    raise SkipHandler()
