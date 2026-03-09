@@ -7,7 +7,7 @@ from state import stats_store
 router = Router()
 
 
-@router.message(F.text == " Статистика")
+@router.message(F.text.in_(["Статистика", " Статистика"]))
 async def stats_handler(message: Message):
     if message.from_user.id != ADMIN_ID:
         return
@@ -16,7 +16,10 @@ async def stats_handler(message: Message):
     total_starts = stats_store["total_starts"]
 
     if stats_store["category_clicks"]:
-        top_category = max(stats_store["category_clicks"], key=stats_store["category_clicks"].get)
+        top_category = max(
+            stats_store["category_clicks"],
+            key=stats_store["category_clicks"].get
+        )
         top_count = stats_store["category_clicks"][top_category]
     else:
         top_category = "—"
@@ -30,7 +33,7 @@ async def stats_handler(message: Message):
     )
 
 
-@router.message(F.text == " Пользователи")
+@router.message(F.text.in_(["Пользователи", " Пользователи"]))
 async def users_handler(message: Message):
     if message.from_user.id != ADMIN_ID:
         return
@@ -43,9 +46,10 @@ async def users_handler(message: Message):
 
     lines = []
 
-    for uid, info in list(users.items())[:30]:
+    for uid, info in list(users.items())[:50]:
         starts = info.get("starts", 0)
         lines.append(f"ID: {uid} | Starts: {starts}")
 
     text = "👥 Пользователи:\n\n" + "\n".join(lines)
+
     await message.answer(text)
