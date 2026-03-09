@@ -20,8 +20,8 @@ def build_main_menu(user_id):
     if user_id == ADMIN_ID:
         rows.append([KeyboardButton(text="➕ Категория")])
         rows.append([KeyboardButton(text="➕ Текст")])
-        rows.append([KeyboardButton(text=" Статистика")])
-        rows.append([KeyboardButton(text=" Пользователи")])
+        rows.append([KeyboardButton(text="Статистика")])
+        rows.append([KeyboardButton(text="Пользователи")])
 
     return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
 
