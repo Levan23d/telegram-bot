@@ -118,6 +118,24 @@ def _is_allowed(user_id: int) -> bool:
 
 
 # =========================
+# auto create database
+# =========================
+
+DB_PATH = Path(os.getenv("FAN_CRM_DB", "data/fans.json"))
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+if not DB_PATH.exists():
+    DB_PATH.write_text('{"fans": []}', encoding="utf-8")
+else:
+    try:
+        raw_data = json.loads(DB_PATH.read_text(encoding="utf-8"))
+        if not isinstance(raw_data, dict) or "fans" not in raw_data or not isinstance(raw_data["fans"], list):
+            DB_PATH.write_text('{"fans": []}', encoding="utf-8")
+    except (OSError, json.JSONDecodeError):
+        DB_PATH.write_text('{"fans": []}', encoding="utf-8")
+
+
+# =========================
 # storage
 # =========================
 
@@ -375,7 +393,7 @@ class FanCRM:
         }
 
 
-crm = FanCRM(os.getenv("FAN_CRM_DB", "data/fans.json"))
+crm = FanCRM(str(DB_PATH))
 
 
 # =========================
